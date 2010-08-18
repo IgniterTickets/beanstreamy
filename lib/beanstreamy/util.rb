@@ -17,10 +17,28 @@ module Beanstreamy
 
     def self.add_address(params, options)
       prepare_address_for_non_american_countries(options)
-      
+      # Bug Alert:
+      # IE8 - URI not escaping '@' as '%40' combined with Beanstream's bewildering hash computations
+      #
+      # Firefox parameters posted:
+      #
+      # merchant_id=208950000&trnAmount=212.00&approvedPage=http%3A%2F%2F192.168.1.120%3A3000%2Fcheckout%2Fapproved&declinedPage=http%3A%2F%2F192.168.1.120%3A3000%2Fcheckout%2Fdeclined&errorPage=http%3A%2F%2F192.168.1.120%3A3000%2Fcheckout%2Fdeclined&hashExpiry=201008171546&ordTax1Price=0.00&ordAddress1=%231511+9918+101st&shipCity=Edmonton&ordProvince=AB&shipName=Timothy+Frison&ordItemPrice=212.00&shipProvince=AB&ordName=Timothy+Frison&shipEmailAddress=dalorface%40gmail.com&ordAddress2=&shipPostalCode=T5K2L1&ordPostalCode=T5K2L1&ordEmailAddress=dalorface%40gmail.com&ordTax2Price=0.00&shipPhoneNumber=5433215123&ordShippingPrice=0.00&shipCountry=CA&ordPhoneNumber=5433215123&trnOrderNumber=R641043381&shipAddress1=%231511+9918+101st&ordCity=Edmonton&ordCountry=CA&shipAddress2=&trnCardOwner=Timothy+Frison&hashValue=94d4593177b06626e650c8b664e844f297941e3b&trnCardType=VI&trnCardNumber=4030000010001234+&trnCardCvd=123&trnExpMonth=08&trnExpYear=10&commit=Purchase+Tickets
+      #
+      # IE 8 parameters posted:
+      # merchant_id=208950000&trnAmount=212.00&approvedPage=http%3A%2F%2F192.168.1.120%3A3000%2Fcheckout%2Fapproved&declinedPage=http%3A%2F%2F192.168.1.120%3A3000%2Fcheckout%2Fdeclined&errorPage=http%3A%2F%2F192.168.1.120%3A3000%2Fcheckout%2Fdeclined&hashExpiry=201008171549&ordTax1Price=0.00&ordAddress1=%231511+9918+101st&shipCity=Edmonton&ordProvince=AB&shipName=Timothy+Frison&ordItemPrice=212.00&shipProvince=AB&ordName=Timothy+Frison&shipEmailAddress=dalorface@gmail.com&ordAddress2=&shipPostalCode=T5K2L1&ordPostalCode=T5K2L1&ordEmailAddress=dalorface@gmail.com&ordTax2Price=0.00&shipPhoneNumber=5433215123&ordShippingPrice=0.00&shipCountry=CA&ordPhoneNumber=5433215123&trnOrderNumber=R360757155&shipAddress1=%231511+9918+101st&ordCity=Edmonton&ordCountry=CA&shipAddress2=&trnCardOwner=Timothy+Frison&hashValue=138ff5d52ffef909e88791c55a9a2365599c55b8&trnCardType=VI&trnCardNumber=4030000010001234+&trnCardCvd=123&trnExpMonth=08&trnExpYear=10&commit=Purchase+Tickets
+      #
+      # Note the difference for: shipEmailAddress and ordEmailAddress
+      #
+      # In short, hash validation fails in IE8 because of the way '@' is not URI escaped in IE.
+      # The solution: No longer 'require' an address to be posted to beanstream, post all the
+      # address EXCEPT the email. This way hash validation will pass.
+      #
+      # Mike Ketler (mketler@beanstream.com) and Chris Lloyd (clloyd@beanstream.com) were the
+      # contact points for this. Mike handled the technical side of things. We diagnosed the issue,
+      # and the 'kludge' solution is don't send the email (which we proposed as the solution).
       if billing_address = options[:billing_address] || options[:address]
         params[:ordName]          = billing_address[:name]
-        params[:ordEmailAddress]  = options[:email]
+       # params[:ordEmailAddress]  = options[:email] # IE8 HATES EMAIL ADDRESS + BEANSTREAM
         params[:ordPhoneNumber]   = billing_address[:phone]
         params[:ordAddress1]      = billing_address[:address1]
         params[:ordAddress2]      = billing_address[:address2]
@@ -32,7 +50,7 @@ module Beanstreamy
 
       if shipping_address = options[:shipping_address]
         params[:shipName]         = shipping_address[:name]
-        params[:shipEmailAddress] = options[:email]
+       # params[:shipEmailAddress] = options[:email] # IE8 HATES EMAIL ADDRESS + BEANSTREAM WIL
         params[:shipPhoneNumber]  = shipping_address[:phone]
         params[:shipAddress1]     = shipping_address[:address1]
         params[:shipAddress2]     = shipping_address[:address2]
@@ -42,7 +60,7 @@ module Beanstreamy
         params[:shipCountry]      = shipping_address[:country]
         params[:shippingMethod]   = shipping_address[:shipping_method]
         params[:deliveryEstimate] = shipping_address[:delivery_estimate]
-      end
+      end  
     end
 
     def self.prepare_address_for_non_american_countries(options)
