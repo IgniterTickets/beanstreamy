@@ -75,6 +75,8 @@ module Beanstreamy
       declined_url = options.delete(:declined_url) || config.declined_url
       error_url = options.delete(:error_url)
 
+      ie_fix = options.delete(:ie_fix)
+
       gateway_options = options.delete(:options) || {}
       gateway_params = {}
       Util.add_address(gateway_params, gateway_options)
@@ -106,7 +108,7 @@ module Beanstreamy
           # Beansream's hosted page uses hash validation to prevent price modification. This hash is computed from
           # the url encoded string of the above inputs
           query_string = hashed_params.reject { |k,v| !v }.map { |k,v| v.to_query(k) }.join('&')
-          hash_value = Util.hash_value(hash_key, query_string)
+          hash_value = Util.hash_value(hash_key, query_string, ie_fix)
 
           concat hidden_field_tag("hashValue", hash_value)
         end

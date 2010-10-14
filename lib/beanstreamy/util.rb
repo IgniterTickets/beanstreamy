@@ -1,7 +1,11 @@
 module Beanstreamy
   module Util
 
-    def self.hash_value(key, message)
+    def self.hash_value(key, message, ie_fix=false)
+      if ie_fix
+        # IE 8 does not escape the '@' character properly, so it needs to be unescaped for the hash value
+        message = message.gsub('%40', '@')
+      end
       Digest::SHA1.hexdigest(message + key)
     end
 
@@ -36,9 +40,15 @@ module Beanstreamy
       # Mike Ketler (mketler@beanstream.com) and Chris Lloyd (clloyd@beanstream.com) were the
       # contact points for this. Mike handled the technical side of things. We diagnosed the issue,
       # and the 'kludge' solution is don't send the email (which we proposed as the solution).
+      #
+      # UPDATE from Jeff:
+      #
+      # I've added an 'ie_fix' flag. If true, the hash code will be computed with unescaped '@' symbols, 
+      # simulating IE8's url encoding. If false, it computes things normally, with the '@' escaped as %40
+      #
       if billing_address = options[:billing_address] || options[:address]
         params[:ordName]          = billing_address[:name]
-       # params[:ordEmailAddress]  = options[:email] # IE8 HATES EMAIL ADDRESS + BEANSTREAM
+        params[:ordEmailAddress]  = options[:email]
         params[:ordPhoneNumber]   = billing_address[:phone]
         params[:ordAddress1]      = billing_address[:address1]
         params[:ordAddress2]      = billing_address[:address2]
@@ -50,7 +60,7 @@ module Beanstreamy
 
       if shipping_address = options[:shipping_address]
         params[:shipName]         = shipping_address[:name]
-       # params[:shipEmailAddress] = options[:email] # IE8 HATES EMAIL ADDRESS + BEANSTREAM WIL
+        params[:shipEmailAddress] = options[:email]
         params[:shipPhoneNumber]  = shipping_address[:phone]
         params[:shipAddress1]     = shipping_address[:address1]
         params[:shipAddress2]     = shipping_address[:address2]
