@@ -2,6 +2,7 @@ module Beanstreamy
   module Util
 
     def self.hash_value(key, message, ie_fix=false)
+      Rails.logger.debug "ie_fix is #{ie_fix.inspect}"
       if ie_fix
         # IE 8 does not escape the '@' character properly, so it needs to be unescaped for the hash value
         message = message.gsub('%40', '@')
