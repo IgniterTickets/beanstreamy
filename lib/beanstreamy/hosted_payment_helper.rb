@@ -107,7 +107,7 @@ module Beanstreamy
         if hash_key.present? && !skip_hash
           # Beansream's hosted page uses hash validation to prevent price modification. This hash is computed from
           # the url encoded string of the above inputs
-          query_string = hashed_params.reject { |k,v| !v }.map { |k,v| v.to_query(k) }.join('&')
+          query_string = hashed_params.reject { |k,v| !v }.map { |k,v| v.to_str.to_query(k) }.join('&')
           hash_value = Util.hash_value(hash_key, query_string, ie_fix)
 
           concat hidden_field_tag("hashValue", hash_value)
