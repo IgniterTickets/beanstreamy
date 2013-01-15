@@ -11,10 +11,11 @@ module Beanstreamy
   @@config = Config.new
 end
 
-require 'active_merchant'
-
 require 'beanstreamy/util'
-require 'beanstreamy/gateway'
+
+if defined?(ActiveMerchant)
+  require 'beanstreamy/gateway'
+end
 
 if defined?(ActionView)
   require 'beanstreamy/hosted_payment_helper'

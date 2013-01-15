@@ -1,0 +1,2 @@
+module Beanstreamy
+end
