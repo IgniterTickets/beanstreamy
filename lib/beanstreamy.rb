@@ -1,3 +1,5 @@
+require 'action_view'
+
 module Beanstreamy
   class Config
     attr_accessor :payment_url, :merchant_id, :hash_key, :approved_url, :declined_url, :error_url
@@ -12,13 +14,11 @@ module Beanstreamy
 end
 
 require 'beanstreamy/util'
+require 'beanstreamy/hosted_payment_helper'
+
+ActionView::Base.send :include, Beanstreamy::HostedPaymentHelper
 
 if defined?(ActiveMerchant)
   require 'beanstreamy/gateway'
 end
 
-if defined?(ActionView)
-  require 'beanstreamy/hosted_payment_helper'
-
-  ActionView::Base.send :include, Beanstreamy::HostedPaymentHelper
-end
