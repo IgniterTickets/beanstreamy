@@ -39,7 +39,7 @@ module Beanstreamy
     #
     # === Example
     #
-    # <%= beanstream_hosted_payment_form 3456, :merchant_id => 454353534, :hash_key => "FK49Clk34Jd",
+    # <%= beanstream_hosted_payment_form 3456, :merchant_id => "454353534", :hash_key => "FK49Clk34Jd",
     #                                          :options => {
     #                                            :order_id => "R5564396848",
     #                                            :email => "customer@example.com",
