@@ -71,7 +71,7 @@ module Beanstreamy
         params[:shipCountry]      = shipping_address[:country]
         params[:shippingMethod]   = shipping_address[:shipping_method]
         params[:deliveryEstimate] = shipping_address[:delivery_estimate]
-      end  
+      end
     end
 
     def self.prepare_address_for_non_american_countries(options)
