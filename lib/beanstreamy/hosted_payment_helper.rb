@@ -98,7 +98,7 @@ module Beanstreamy
       hashed_params += Array(gateway_params)
       hashed_params += Array(extra_params)
 
-      form = content_tag(:form, options.merge(:action => config.payment_url, :method => "post")) do
+      content_tag(:form, options.merge(:action => config.payment_url, :method => "post")) do
         hashed_params.each do |key, value|
           concat hidden_field_tag(key, value) if value
         end
@@ -113,10 +113,10 @@ module Beanstreamy
           concat hidden_field_tag("hashValue", hash_value)
         end
 
-        block.call(:hash_value => hash_value, :query_string => query_string)
+        if block_given?
+          block.call(:hash_value => hash_value, :query_string => query_string)
+        end
       end
-
-      concat form
     end
   end
 end
