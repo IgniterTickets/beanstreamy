@@ -1,9 +1,6 @@
 module Beanstreamy
   module HostedPaymentHelper
 
-    mattr_accessor :config
-    @@config = Beanstreamy.config
-
     # Generate a form that will submit payment information to Beanstream's payment gateway 
     # using the http POST method.
     #
@@ -67,12 +64,12 @@ module Beanstreamy
     def beanstream_hosted_payment_form(amount, options = {}, &block)
       amount = Util.amount(amount) # convert from cents to dollars
 
-      merchant_id = options.delete(:merchant_id) || config.merchant_id
-      hash_key = options.delete(:hash_key) || config.hash_key
+      merchant_id = options.delete(:merchant_id) || Beanstreamy.config.merchant_id
+      hash_key = options.delete(:hash_key) || Beanstreamy.config.hash_key
       skip_hash = options.delete(:skip_hash)
 
-      approved_url = options.delete(:approved_url) || config.approved_url
-      declined_url = options.delete(:declined_url) || config.declined_url
+      approved_url = options.delete(:approved_url) || Beanstreamy.config.approved_url
+      declined_url = options.delete(:declined_url) || Beanstreamy.config.declined_url
       error_url = options.delete(:error_url)
 
       ie_fix = options.delete(:ie_fix)
@@ -98,7 +95,7 @@ module Beanstreamy
       hashed_params += Array(gateway_params)
       hashed_params += Array(extra_params)
 
-      content_tag(:form, options.merge(:action => config.payment_url, :method => "post")) do
+      content_tag(:form, options.merge(:action => Beanstreamy.config.payment_url, :method => "post")) do
         hashed_params.each do |key, value|
           concat hidden_field_tag(key, value) if value
         end
