@@ -53,7 +53,7 @@ module Beanstreamy
   module HashValidation
     private
 
-    def post_data(params)
+    def post_data(params, use_profile_api=false)
       params = super
 
       hash_key = @options[:hash_key]
